@@ -1,0 +1,3126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LeafID — AI Leaf Identifier, Medicinal Benefits & Plant Care</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,600&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;600;700&family=Noto+Sans+Telugu:wght@400;600;700&display=swap" rel="stylesheet">
+<!-- Leaflet.js Interactive Botanical Distribution Map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<style>
+  :root, [data-theme="forest"] {
+    --bg: #E7EDE5;
+    --surface: #F7F9F5;
+    --ink: #17301F;
+    --muted: #56695B;
+    --accent: #2F6B3A;
+    --accent-ink: #ffffff;
+    --soft: #D6E3D2;
+    --line: #B9C7BB;
+    --alert: #9A3B2E;
+    --alert-bg: #F6E4E0;
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --shadow-sm: 0 2px 8px rgba(23, 48, 31, 0.06);
+    --shadow-md: 0 10px 30px -4px rgba(23, 48, 31, 0.1);
+    --shadow-lg: 0 20px 45px -8px rgba(23, 48, 31, 0.14);
+  }
+  [data-theme="ocean"] {
+    --bg: #E3EEF2;
+    --surface: #F5FAFB;
+    --ink: #10303A;
+    --muted: #4D6B75;
+    --accent: #17718A;
+    --accent-ink: #ffffff;
+    --soft: #CFE4EB;
+    --line: #B2CBD3;
+    --alert: #A83232;
+    --alert-bg: #F9E8E8;
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --shadow-sm: 0 2px 8px rgba(16, 48, 58, 0.06);
+    --shadow-md: 0 10px 30px -4px rgba(16, 48, 58, 0.1);
+    --shadow-lg: 0 20px 45px -8px rgba(16, 48, 58, 0.14);
+  }
+  [data-theme="marigold"] {
+    --bg: #F6EFD8;
+    --surface: #FFFBEA;
+    --ink: #3A2A0B;
+    --muted: #6F5A2E;
+    --accent: #98600A;
+    --accent-ink: #ffffff;
+    --soft: #EFE0AE;
+    --line: #DCCB96;
+    --alert: #A03A20;
+    --alert-bg: #FBECE8;
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --shadow-sm: 0 2px 8px rgba(58, 42, 11, 0.06);
+    --shadow-md: 0 10px 30px -4px rgba(58, 42, 11, 0.1);
+    --shadow-lg: 0 20px 45px -8px rgba(58, 42, 11, 0.14);
+  }
+  [data-theme="orchid"] {
+    --bg: #EDE6F2;
+    --surface: #FAF7FC;
+    --ink: #2B1B3A;
+    --muted: #66567A;
+    --accent: #7A3E9D;
+    --accent-ink: #ffffff;
+    --soft: #DFD1EA;
+    --line: #CBBBD8;
+    --alert: #9E2B4B;
+    --alert-bg: #FAE8EE;
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --shadow-sm: 0 2px 8px rgba(43, 27, 58, 0.06);
+    --shadow-md: 0 10px 30px -4px rgba(43, 27, 58, 0.1);
+    --shadow-lg: 0 20px 45px -8px rgba(43, 27, 58, 0.14);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 5.5rem; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 400 1rem/1.6 "Instrument Sans", "Noto Sans Devanagari", "Noto Sans Tamil", "Noto Sans Telugu", system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    body, .card-mount, .result-card, .app-header, .app-footer, .btn-primary, .theme-btn, .lang-switcher-box {
+      transition: background-color .3s ease, color .3s ease, border-color .3s ease, box-shadow .3s ease;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 0 1.25rem; width: 100%; }
+  h1, h2, h3, h4 { font-family: Newsreader, "Noto Sans Devanagari", "Noto Sans Tamil", "Noto Sans Telugu", Georgia, serif; margin: 0; line-height: 1.15; }
+
+  /* ---------------- Header ---------------- */
+  .app-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--surface);
+    border-bottom: 1.5px solid var(--line);
+    box-shadow: var(--shadow-sm);
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1.25rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .brand-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-sm);
+    background: var(--accent);
+    display: grid;
+    place-items: center;
+    color: var(--accent-ink);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+  }
+  .brand-text h1 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+  .brand-badge {
+    font-size: 0.68rem;
+    font-family: "Instrument Sans", sans-serif;
+    font-weight: 700;
+    background: var(--soft);
+    color: var(--ink);
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    letter-spacing: 0.04em;
+  }
+  .brand-text p {
+    margin: 0.1rem 0 0;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  .header-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+  }
+
+  /* Language Switcher */
+  .lang-switcher-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: var(--bg);
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    padding: 0.2rem 0.65rem 0.2rem 0.5rem;
+    box-shadow: var(--shadow-sm);
+  }
+  .lang-select {
+    background: transparent;
+    border: none;
+    color: var(--ink);
+    font: 600 0.8rem "Instrument Sans", system-ui, sans-serif;
+    cursor: pointer;
+    outline: none;
+    padding: 0.1rem 0;
+  }
+  .lang-select option {
+    background: var(--surface);
+    color: var(--ink);
+  }
+
+  /* Theme Switcher */
+  .theme-switcher-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    background: var(--bg);
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    padding: 0.2rem 0.3rem;
+  }
+  .theme-switcher-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0 0.35rem 0 0.45rem;
+  }
+  .theme-btn {
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--muted);
+    font: 600 0.76rem "Instrument Sans", sans-serif;
+    padding: 0.22rem 0.6rem;
+    border-radius: 999px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  .theme-btn:hover { color: var(--ink); background: var(--soft); }
+  .theme-btn.active {
+    background: var(--accent);
+    color: var(--accent-ink);
+    border-color: var(--accent);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.12);
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.76rem;
+    font-weight: 600;
+    padding: 0.32rem 0.65rem;
+    border-radius: 999px;
+    background: var(--soft);
+    border: 1px solid var(--line);
+    color: var(--ink);
+  }
+  .pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 0 rgba(47, 107, 58, 0.7);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(47, 107, 58, 0.7); }
+    70% { box-shadow: 0 0 0 6px rgba(47, 107, 58, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(47, 107, 58, 0); }
+  }
+
+  .btn-header {
+    background: var(--surface);
+    border: 1.5px solid var(--line);
+    color: var(--ink);
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--radius-sm);
+    font: 600 0.8rem "Instrument Sans", sans-serif;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: all .2s;
+  }
+  .btn-header:hover { background: var(--soft); border-color: var(--accent); }
+
+  /* ---------------- Main Content ---------------- */
+  main {
+    flex: 1;
+    padding: 2.25rem 0 4rem;
+  }
+
+  .hero-banner {
+    text-align: center;
+    margin-bottom: 2.25rem;
+  }
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: var(--soft);
+    border: 1px solid var(--line);
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--ink);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.65rem;
+  }
+  .hero-banner h2 {
+    font-size: clamp(2rem, 4.5vw, 2.85rem);
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+  }
+  .hero-banner p {
+    color: var(--muted);
+    font-size: 1.05rem;
+    max-width: 58ch;
+    margin: 0 auto;
+  }
+
+  /* ---------------- Layout Grid ---------------- */
+  .layout-grid {
+    display: grid;
+    grid-template-columns: minmax(320px, 390px) minmax(0, 1fr);
+    gap: 2rem;
+    align-items: start;
+  }
+  @media (max-width: 860px) {
+    .layout-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ---------------- Specimen Card (Mount) ---------------- */
+  .card-mount {
+    background: var(--surface);
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-md);
+    position: sticky;
+    top: 5.5rem;
+  }
+  .card-header-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  .card-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+  .badge-mount {
+    font-size: 0.68rem;
+    font-weight: 700;
+    background: var(--soft);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+  }
+
+  /* Dropzone */
+  .dropzone {
+    border: 2px dashed var(--accent);
+    border-radius: var(--radius-md);
+    background: var(--bg);
+    padding: 2rem 1.25rem;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    min-height: 250px;
+    display: grid;
+    place-items: center;
+    transition: all .2s ease;
+  }
+  .dropzone:hover, .dropzone.drag-active {
+    background: var(--soft);
+    border-style: solid;
+    box-shadow: 0 0 0 4px var(--soft);
+  }
+  .dropzone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+  }
+  .drop-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.65rem;
+    pointer-events: none;
+  }
+  .drop-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    border: 1.5px solid var(--line);
+    display: grid;
+    place-items: center;
+    color: var(--accent);
+    box-shadow: var(--shadow-sm);
+  }
+  .drop-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .drop-desc {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--muted);
+    max-width: 26ch;
+  }
+  .drop-pill {
+    font-size: 0.72rem;
+    font-weight: 600;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    color: var(--muted);
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+  }
+
+  /* Image Preview */
+  .preview-wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    border-radius: calc(var(--radius-md) - 2px);
+    overflow: hidden;
+    background: #000;
+  }
+  .preview-image {
+    width: 100%;
+    max-height: 300px;
+    object-fit: cover;
+    display: block;
+  }
+  .preview-overlay {
+    position: absolute;
+    bottom: 0;
+    inset-inline: 0;
+    padding: 0.65rem 0.85rem;
+    background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 100%);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+
+  /* Camera & Upload Options */
+  .mount-controls-row {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+  }
+  .btn-camera {
+    flex: 1;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 0.65rem 0.85rem;
+    font: 600 0.85rem "Instrument Sans", sans-serif;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    transition: all .2s;
+  }
+  .btn-camera:hover {
+    background: var(--soft);
+    border-color: var(--accent);
+  }
+
+  /* Actions */
+  .mount-actions {
+    margin-top: 0.75rem;
+    display: flex;
+    gap: 0.5rem;
+  }
+  .btn-primary {
+    flex: 2;
+    background: var(--accent);
+    color: var(--accent-ink);
+    border: 1.5px solid var(--accent);
+    border-radius: var(--radius-sm);
+    padding: 0.8rem 1.2rem;
+    font: 600 0.95rem "Instrument Sans", sans-serif;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    transition: all .2s ease;
+  }
+  .btn-primary:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+    filter: brightness(1.08);
+  }
+  .btn-primary:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+  .btn-secondary {
+    flex: 1;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 0.8rem 0.9rem;
+    font: 600 0.95rem "Instrument Sans", sans-serif;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .btn-secondary:hover { background: var(--soft); border-color: var(--accent); }
+
+  /* Quick Demo sample */
+  .quick-demo-section {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .quick-demo-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+  }
+  .sample-chip {
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.28rem 0.7rem;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1.5px solid var(--line);
+    color: var(--ink);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: all .2s;
+  }
+  .sample-chip:hover { background: var(--soft); border-color: var(--accent); }
+
+  /* ---------------- Results Column ---------------- */
+  .results-pane {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .placeholder-card {
+    background: var(--surface);
+    border: 1.5px dashed var(--line);
+    border-radius: var(--radius-lg);
+    padding: 3.5rem 2rem;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+  }
+  .placeholder-icon {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: var(--soft);
+    border: 2px solid var(--line);
+    display: grid;
+    place-items: center;
+    margin: 0 auto 1.25rem;
+    color: var(--accent);
+  }
+  .placeholder-card h3 {
+    font-size: 1.45rem;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+  }
+  .placeholder-card p {
+    color: var(--muted);
+    max-width: 44ch;
+    margin: 0 auto;
+    font-size: 0.95rem;
+  }
+
+  .loading-card {
+    background: var(--surface);
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 3rem 2rem;
+    text-align: center;
+    box-shadow: var(--shadow-md);
+  }
+  .spinner-leaf {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 1.25rem;
+    border-radius: 50%;
+    border: 3px solid var(--soft);
+    border-top-color: var(--accent);
+    animation: spin .9s infinite linear;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-title {
+    font-size: 1.35rem;
+    color: var(--ink);
+    margin-bottom: 0.45rem;
+  }
+  .loading-step {
+    font-size: 0.92rem;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .notice-banner {
+    background: var(--alert-bg);
+    border: 1.5px solid var(--alert);
+    border-radius: var(--radius-md);
+    padding: 1.25rem 1.5rem;
+    color: var(--alert);
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    box-shadow: var(--shadow-sm);
+  }
+  .notice-banner h4 { font-size: 1.05rem; margin-bottom: 0.25rem; }
+  .notice-banner p { margin: 0; font-size: 0.92rem; }
+
+  /* ---------------- Result Cards ---------------- */
+  .result-card {
+    background: var(--surface);
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 1.75rem;
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+    animation: fadeInSlide .35s ease-out forwards;
+  }
+  @keyframes fadeInSlide {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Result Actions Bar */
+  .result-action-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  .btn-action {
+    background: var(--surface);
+    border: 1.5px solid var(--line);
+    color: var(--ink);
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--radius-sm);
+    font: 600 0.8rem "Instrument Sans", sans-serif;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: all .2s;
+  }
+  .btn-action:hover {
+    background: var(--soft);
+    border-color: var(--accent);
+    transform: translateY(-1px);
+  }
+
+  .plant-hero-card {
+    border-top: 4px solid var(--accent);
+  }
+  .hero-plant-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-bottom: 1.15rem;
+  }
+  .plant-titles h2 {
+    font-size: clamp(2rem, 3.8vw, 2.6rem);
+    color: var(--ink);
+    margin-bottom: 0.25rem;
+  }
+  .sci-pronounce-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0 0 0.5rem;
+    flex-wrap: wrap;
+  }
+  .plant-sci {
+    font-family: Newsreader, Georgia, serif;
+    font-style: italic;
+    font-size: 1.35rem;
+    color: var(--accent);
+    margin: 0;
+  }
+  .btn-pronounce {
+    background: var(--soft);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    font: 600 0.75rem "Instrument Sans", sans-serif;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    transition: all .2s;
+  }
+  .btn-pronounce:hover {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+  .btn-pronounce.speaking {
+    background: var(--accent);
+    color: var(--accent-ink);
+    animation: speakPulse 1s infinite alternate;
+  }
+  @keyframes speakPulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.08); }
+  }
+
+  /* Quick Spec Badges */
+  .quick-specs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.65rem;
+    margin: 1.15rem 0;
+    padding: 0.9rem;
+    background: var(--bg);
+    border-radius: var(--radius-md);
+    border: 1.5px solid var(--line);
+  }
+  .quick-spec-card {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .spec-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    display: grid;
+    place-items: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+  .spec-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1.1;
+  }
+  .spec-val {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.25;
+  }
+  .spec-pet-safe { color: var(--accent); font-weight: 700; }
+  .spec-pet-toxic { color: var(--alert); font-weight: 700; }
+
+  .meta-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-top: 0.5rem;
+  }
+  .meta-chip {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    background: var(--soft);
+    border: 1px solid var(--line);
+    color: var(--ink);
+  }
+
+  .match-meter {
+    background: var(--bg);
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    text-align: right;
+    min-width: 140px;
+    box-shadow: var(--shadow-sm);
+  }
+  .match-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+  }
+  .match-score {
+    font-family: Newsreader, Georgia, serif;
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .meter-bar {
+    height: 7px;
+    background: var(--soft);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 0.4rem;
+    border: 1px solid var(--line);
+  }
+  .meter-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 4px;
+    transition: width 1s ease-out;
+  }
+
+  /* Dual Leaf Comparison */
+  .comparison-box {
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1.5px dashed var(--line);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+  @media (max-width: 600px) {
+    .comparison-box { grid-template-columns: 1fr; }
+  }
+  .comparison-panel {
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-md);
+    background: var(--bg);
+    overflow: hidden;
+    cursor: zoom-in;
+    position: relative;
+    transition: all .2s;
+  }
+  .comparison-panel:hover {
+    border-color: var(--accent);
+    box-shadow: var(--shadow-sm);
+  }
+  .comparison-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--ink);
+    background: var(--soft);
+    padding: 0.45rem 0.85rem;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .comparison-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+  }
+  .zoom-hint {
+    position: absolute;
+    bottom: 0.5rem;
+    right: 0.5rem;
+    background: rgba(0,0,0,0.65);
+    color: #fff;
+    padding: 0.2rem 0.45rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    pointer-events: none;
+  }
+
+  /* Summary box */
+  .plant-summary-box {
+    margin-top: 1.25rem;
+    padding: 1.15rem 1.35rem;
+    background: var(--bg);
+    border-radius: var(--radius-md);
+    border: 1.5px solid var(--line);
+  }
+  .plant-summary-box h4 {
+    font-size: 1.05rem;
+    color: var(--ink);
+    margin-bottom: 0.35rem;
+  }
+  .plant-summary-box p {
+    margin: 0;
+    font-size: 0.92rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* ---------------- Uses & Benefits Grid & Filter Tabs ---------------- */
+  .benefits-section-wrapper {
+    margin-top: 0.5rem;
+  }
+  .section-headline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .section-headline h3 {
+    font-size: 1.55rem;
+    color: var(--ink);
+  }
+
+  /* Category Filter Pills */
+  .benefits-filter-bar {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+  }
+  .filter-pill {
+    background: var(--surface);
+    border: 1.5px solid var(--line);
+    color: var(--muted);
+    font: 600 0.8rem "Instrument Sans", sans-serif;
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .filter-pill:hover {
+    color: var(--ink);
+    background: var(--soft);
+  }
+  .filter-pill.active {
+    background: var(--accent);
+    color: var(--accent-ink);
+    border-color: var(--accent);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+
+  .benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+  }
+  .benefit-card {
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    border: 1.5px solid var(--line);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    transition: all .25s ease;
+  }
+  .benefit-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--accent);
+  }
+  .benefit-card.hidden {
+    display: none;
+  }
+
+  .card-medicinal { border-top: 4px solid var(--accent); }
+  .card-culinary { border-top: 4px solid var(--accent); }
+  .card-domestic { border-top: 4px solid var(--accent); }
+  .card-care { border-top: 4px solid var(--accent); }
+  .card-caution {
+    border-top: 4px solid var(--alert);
+    background: var(--alert-bg);
+    border-color: var(--alert);
+  }
+
+  .benefit-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-bottom: 0.85rem;
+  }
+  .benefit-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sm);
+    display: grid;
+    place-items: center;
+    font-size: 1.15rem;
+    background: var(--soft);
+    border: 1px solid var(--line);
+  }
+  .benefit-card-title {
+    font-size: 1.15rem;
+    color: var(--ink);
+  }
+  .card-caution .benefit-card-title {
+    color: var(--alert);
+  }
+
+  .benefit-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    flex: 1;
+  }
+  .benefit-item {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+  .benefit-item strong {
+    color: var(--ink);
+    font-family: Newsreader, Georgia, serif;
+    font-size: 1.05rem;
+    display: block;
+    margin-bottom: 0.15rem;
+  }
+  .card-caution .benefit-item strong {
+    color: var(--alert);
+  }
+
+  /* Candidates grid */
+  .alternatives-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+  }
+  .alt-pill {
+    padding: 0.65rem 0.85rem;
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    border: 1.5px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.88rem;
+    transition: all .2s;
+  }
+  .alt-pill:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+  }
+  .alt-name {
+    font-weight: 600;
+    color: var(--ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+  }
+  .alt-sci {
+    font-family: Newsreader, serif;
+    font-style: italic;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+  .alt-pct {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--accent-ink);
+    background: var(--accent);
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+  }
+
+  /* ---------------- Plant Geographic Distribution Map ---------------- */
+  .distribution-card {
+    background: var(--surface);
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    margin-top: 1.5rem;
+    position: relative;
+    transition: all .25s ease;
+  }
+  .distribution-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .distribution-header h3 {
+    font-size: 1.4rem;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .dist-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.85rem;
+    margin-bottom: 1.15rem;
+  }
+  .dist-meta-card {
+    background: var(--bg);
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 0.95rem;
+    box-shadow: var(--shadow-sm);
+  }
+  .dist-meta-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .dist-meta-value {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+  .dist-summary-box {
+    background: var(--bg);
+    border-left: 4px solid var(--accent);
+    padding: 0.85rem 1.1rem;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.55;
+    margin-bottom: 1.15rem;
+    border-top: 1px solid var(--line);
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+
+  /* Region quick navigation bar */
+  .dist-regions-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.85rem;
+    padding: 0.35rem 0;
+  }
+  .dist-regions-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--muted);
+    margin-right: 0.2rem;
+  }
+  .dist-region-btn {
+    background: var(--surface);
+    border: 1.5px solid var(--line);
+    color: var(--ink);
+    font: 600 0.78rem "Instrument Sans", sans-serif;
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all .2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+  .dist-region-btn:hover {
+    background: var(--soft);
+    border-color: var(--accent);
+    transform: translateY(-1px);
+  }
+  .dist-region-btn.active {
+    background: var(--accent);
+    color: var(--accent-ink);
+    border-color: var(--accent);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  }
+  .dist-btn-reset {
+    margin-left: auto;
+    background: transparent;
+    border: 1px solid var(--line);
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: var(--muted);
+    padding: 0.22rem 0.55rem;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .dist-btn-reset:hover {
+    background: var(--soft);
+    color: var(--ink);
+    border-color: var(--accent);
+  }
+
+  /* Map Container */
+  .map-wrapper {
+    position: relative;
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    background: #e5e9ec;
+  }
+  #plantDistributionMap {
+    width: 100%;
+    height: 380px;
+    z-index: 10;
+  }
+  @media (max-width: 600px) {
+    #plantDistributionMap { height: 290px; }
+  }
+
+  /* Leaflet Map overrides for theme styling */
+  .leaflet-container {
+    font-family: "Instrument Sans", "Noto Sans Devanagari", "Noto Sans Tamil", "Noto Sans Telugu", system-ui, sans-serif !important;
+  }
+  .leaflet-popup-content-wrapper {
+    background: var(--surface) !important;
+    color: var(--ink) !important;
+    border: 1.5px solid var(--line) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-md) !important;
+    padding: 0.2rem !important;
+  }
+  .leaflet-popup-tip {
+    background: var(--surface) !important;
+    border: 1px solid var(--line) !important;
+  }
+  .leaflet-popup-content {
+    margin: 0.75rem 0.85rem !important;
+    line-height: 1.45 !important;
+  }
+  .popup-region-title {
+    font-family: Newsreader, Georgia, serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem;
+    color: var(--ink);
+  }
+  .popup-status-badge {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.15rem 0.45rem;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.4rem;
+  }
+  .badge-native {
+    background: var(--soft);
+    color: var(--accent);
+    border: 1px solid var(--line);
+  }
+  .badge-naturalized {
+    background: var(--bg);
+    color: var(--ink);
+    border: 1px solid var(--line);
+  }
+  .popup-region-desc {
+    font-size: 0.84rem;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  /* Custom Leaf Marker Pin */
+  .custom-leaf-pin-container {
+    background: transparent;
+    border: none;
+  }
+  .custom-leaf-pin {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    background: var(--surface);
+    border: 2px solid var(--accent);
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+    transition: transform .2s ease;
+  }
+  .custom-leaf-pin:hover {
+    transform: rotate(-45deg) scale(1.15);
+  }
+  .custom-leaf-pin span {
+    transform: rotate(45deg);
+    font-size: 1rem;
+    display: block;
+    line-height: 1;
+  }
+
+  /* ---------------- Recent Scans Section ---------------- */
+  .recent-scans-card {
+    background: var(--surface);
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    margin-top: 1.5rem;
+  }
+  .recent-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  .recent-header h3 {
+    font-size: 1.25rem;
+    color: var(--ink);
+  }
+  .btn-clear-history {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font: 600 0.78rem "Instrument Sans", sans-serif;
+    cursor: pointer;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+  }
+  .btn-clear-history:hover { color: var(--alert); background: var(--alert-bg); }
+  .recent-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 0.85rem;
+  }
+  .recent-item {
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-md);
+    background: var(--bg);
+    overflow: hidden;
+    cursor: pointer;
+    transition: all .2s;
+    text-align: left;
+    padding: 0;
+  }
+  .recent-item:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+  }
+  .recent-thumb {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    display: block;
+    background: var(--soft);
+  }
+  .recent-body {
+    padding: 0.6rem 0.75rem;
+  }
+  .recent-name {
+    font: 600 0.88rem "Instrument Sans", sans-serif;
+    color: var(--ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .recent-sub {
+    font-size: 0.75rem;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.2rem;
+  }
+
+  /* ---------------- Footer ---------------- */
+  .app-footer {
+    background: var(--surface);
+    border-top: 1.5px solid var(--line);
+    margin-top: auto;
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.02);
+  }
+  .footer-inner {
+    padding: 3rem 0 2rem;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1.2fr 1.5fr;
+    gap: 2.5rem;
+    margin-bottom: 2.5rem;
+  }
+  @media (max-width: 820px) {
+    .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+  }
+  .footer-col h4 {
+    font-size: 1.15rem;
+    color: var(--ink);
+    margin-bottom: 0.85rem;
+  }
+  .footer-col p {
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin: 0 0 0.75rem;
+  }
+  .footer-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .footer-list li {
+    font-size: 0.88rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+  .disclaimer-card {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 0.85rem 1rem;
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+  .footer-bottom {
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+
+  /* ---------------- Modals (Camera, Lightbox, Tips) ---------------- */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    display: none;
+    place-items: center;
+    padding: 1.5rem;
+  }
+  .modal-backdrop.open { display: grid; }
+  .modal-dialog {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    border: 1.5px solid var(--line);
+    max-width: 520px;
+    width: 100%;
+    padding: 1.75rem;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    animation: modalIn .2s ease-out;
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(.96) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.35rem;
+    cursor: pointer;
+    color: var(--muted);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+  }
+  .modal-close:hover { background: var(--soft); color: var(--ink); }
+
+  /* Camera Viewfinder */
+  .camera-view-container {
+    width: 100%;
+    height: 300px;
+    background: #000;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    position: relative;
+    margin: 1rem 0;
+    display: grid;
+    place-items: center;
+  }
+  #webcamVideo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .camera-overlay-frame {
+    position: absolute;
+    width: 70%;
+    height: 80%;
+    border: 2px dashed rgba(255, 255, 255, 0.8);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    pointer-events: none;
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.35);
+  }
+
+  /* Lightbox Magnifier Modal */
+  .lightbox-dialog {
+    max-width: 800px;
+    padding: 1.25rem;
+    text-align: center;
+  }
+  .lightbox-viewport {
+    width: 100%;
+    max-height: 65vh;
+    overflow: auto;
+    border-radius: var(--radius-md);
+    background: #000;
+    display: grid;
+    place-items: center;
+    position: relative;
+  }
+  #lightboxImg {
+    max-width: 100%;
+    max-height: 60vh;
+    object-fit: contain;
+    transition: transform .2s ease;
+    transform-origin: center center;
+  }
+  .lightbox-controls {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  /* Toast Notification */
+  .toast-notice {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--ink);
+    color: var(--surface);
+    padding: 0.75rem 1.4rem;
+    border-radius: 999px;
+    font: 600 0.88rem "Instrument Sans", sans-serif;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+    z-index: 150;
+    opacity: 0;
+    pointer-events: none;
+    transition: transform .3s ease, opacity .3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .toast-notice.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+
+  /* ---------------- Print Stylesheet ---------------- */
+  @media print {
+    .app-header, .app-footer, .card-mount, .modal-backdrop,
+    .result-action-bar, .benefits-filter-bar, .quick-demo-section,
+    .theme-switcher-box, .lang-switcher-box, .btn-pronounce, .zoom-hint {
+      display: none !important;
+    }
+    body, main {
+      background: #fff !important;
+      color: #000 !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+    .layout-grid {
+      display: block !important;
+    }
+    .result-card {
+      border: 1px solid #999 !important;
+      box-shadow: none !important;
+      break-inside: avoid;
+      margin-bottom: 1.5rem !important;
+    }
+    .benefit-card {
+      border: 1px solid #ccc !important;
+      box-shadow: none !important;
+      break-inside: avoid;
+    }
+    .benefit-card.hidden {
+      display: flex !important;
+    }
+    .comparison-img {
+      max-height: 140px !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="app-header">
+  <div class="wrap header-inner">
+    <a href="/" class="brand">
+      <div class="brand-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+          <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>LeafID <span class="brand-badge">PRO 2.0</span></h1>
+        <p data-i18n="brand_sub">AI Plant Classifier & Botanical Guide</p>
+      </div>
+    </a>
+
+    <div class="header-controls">
+      <!-- Language Selector -->
+      <div class="lang-switcher-box" title="Select Language / भाषा चुनें / மொழியைத் தேர்ந்தெடுக்கவும் / భాషను ఎంచుకోండి">
+        <span style="font-size: 0.85rem;">🌐</span>
+        <select id="langSelect" class="lang-select" aria-label="Select Language">
+          <option value="en">English</option>
+          <option value="hi">हिन्दी (Hindi)</option>
+          <option value="ta">தமிழ் (Tamil)</option>
+          <option value="te">తెలుగు (Telugu)</option>
+        </select>
+      </div>
+
+      <!-- Theme Switcher -->
+      <div class="theme-switcher-box" role="radiogroup" aria-label="Color Theme">
+        <span class="theme-switcher-label">Theme</span>
+        <button type="button" class="theme-btn active" data-theme-set="forest" title="Forest Theme">🌲 Forest</button>
+        <button type="button" class="theme-btn" data-theme-set="ocean" title="Ocean Theme">🌊 Ocean</button>
+        <button type="button" class="theme-btn" data-theme-set="marigold" title="Marigold Theme">🌼 Marigold</button>
+        <button type="button" class="theme-btn" data-theme-set="orchid" title="Orchid Theme">🪻 Orchid</button>
+      </div>
+
+      <div class="status-pill">
+        <span class="pulse-dot"></span>
+        <span data-i18n="online_status">Pl@ntNet Online</span>
+      </div>
+
+      <button type="button" class="btn-header" id="btn-tips">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M12 16v-4"></path>
+          <path d="M12 8h.01"></path>
+        </svg>
+        <span data-i18n="tips_btn">Photo Tips</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Main Container -->
+<main>
+  <div class="wrap">
+    <!-- Hero Banner -->
+    <section class="hero-banner">
+      <div class="hero-tag">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+        </svg>
+        <span data-i18n="hero_tag">AI Taxonomy & Wellness</span>
+      </div>
+      <h2 data-i18n="hero_title">Identify Leaves & Discover Uses Instantly</h2>
+      <p data-i18n="hero_desc">Upload or snap a photo of any leaf to reveal the exact species, medicinal remedies, culinary applications, and plant care — right on this page.</p>
+    </section>
+
+    <!-- Layout Grid -->
+    <div class="layout-grid">
+      <!-- Left Column: Specimen Mount -->
+      <div class="card-mount">
+        <div class="card-header-label">
+          <h3 class="card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <span data-i18n="mount_title">Specimen Mount</span>
+          </h3>
+          <span class="badge-mount" data-i18n="mount_badge">AI SCANNER</span>
+        </div>
+
+        <!-- Dropzone -->
+        <div class="dropzone" id="dropzone">
+          <input type="file" id="fileInput" accept="image/*" title="Choose a leaf photo">
+          <div id="dropContent" class="drop-content">
+            <div class="drop-icon">
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+                <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+              </svg>
+            </div>
+            <h4 class="drop-title" data-i18n="drop_title">Select or Drop Leaf Photo</h4>
+            <p class="drop-desc" data-i18n="drop_desc">Drag an image here, or tap to browse</p>
+            <span class="drop-pill">JPG, PNG, WEBP • Max 8MB</span>
+          </div>
+        </div>
+
+        <!-- Camera Capture Row -->
+        <div class="mount-controls-row">
+          <button type="button" class="btn-camera" id="btnLiveCam">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+              <circle cx="12" cy="13" r="4"></circle>
+            </svg>
+            <span data-i18n="btn_live_cam">Live Camera</span>
+          </button>
+          <input type="file" id="cameraDirectInput" accept="image/*" capture="environment" style="display:none">
+        </div>
+
+        <!-- Primary Actions -->
+        <div class="mount-actions">
+          <button id="btnIdentify" class="btn-primary" disabled>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.3-4.3"/>
+            </svg>
+            <span data-i18n="btn_identify">Identify Leaf</span>
+          </button>
+          <button id="btnClear" class="btn-secondary" type="button" data-i18n="btn_clear">Clear</button>
+        </div>
+
+        <!-- Quick Demo Sample -->
+        <div class="quick-demo-section">
+          <span class="quick-demo-title" data-i18n="demo_label">Demo Specimen</span>
+          <button type="button" class="sample-chip" id="btnSampleLeaf" data-sample="/static/samples/sample_leaf.jpg" data-i18n="demo_btn">
+            🌿 Demo Leaf Sample
+          </button>
+        </div>
+      </div>
+
+      <!-- Right Column: Results Section -->
+      <div class="results-pane" id="resultsPane" aria-live="polite">
+        <!-- Placeholder Empty State -->
+        <div class="placeholder-card" id="emptyPlaceholder">
+          <div class="placeholder-icon">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+            </svg>
+          </div>
+          <h3 data-i18n="empty_title">No Leaf Selected Yet</h3>
+          <p data-i18n="empty_desc">Choose or snap a leaf photo in the specimen mount to trigger instant identification and display all medicinal, culinary, and care benefits right here.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Scans Section -->
+    <div class="recent-scans-card" id="recentScansContainer" style="display:none;">
+      <div class="recent-header">
+        <h3 data-i18n="recent_title">📜 Recent Leaf Scans</h3>
+        <button type="button" class="btn-clear-history" id="btnClearRecent" data-i18n="clear_history">Clear History</button>
+      </div>
+      <div class="recent-grid" id="recentGrid"></div>
+    </div>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer class="app-footer">
+  <div class="wrap footer-inner">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+          </svg>
+          LeafID Botanical Intelligence
+        </h4>
+        <p>Automated plant identification, ethnobotanical profile analysis, and indoor horticulture care. Designed for botanists, students, home gardeners, and nature lovers.</p>
+        <p>All medicinal and culinary benefits are synthesized and displayed immediately on-page without external redirection.</p>
+      </div>
+
+      <div class="footer-col">
+        <h4>Intelligence Engines</h4>
+        <ul class="footer-list">
+          <li>🌿 Pl@ntNet AI Neural Classifier</li>
+          <li>📖 Wikipedia Open Botanical Ontology</li>
+          <li>🖼️ Pillow High-Res Computer Vision</li>
+          <li>🛡️ Built-in Plant Taxonomy Knowledge Base</li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Botanical Safety Advisory</h4>
+        <div class="disclaimer-card">
+          Plant identification is powered by machine learning algorithms for educational exploration. Never ingest wild plants or administer herbal remedies without direct consultation from a certified botanist or medical physician.
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div>© 2026 Leaf Identifier • Powered by Pl@ntNet & Open Botanical Knowledge</div>
+      <div>Designed with 🌿 for Nature Enthusiasts</div>
+    </div>
+  </div>
+</footer>
+
+<!-- ---------------- Modals ---------------- -->
+
+<!-- Photo Tips Modal -->
+<div class="modal-backdrop" id="tipsModal">
+  <div class="modal-dialog">
+    <button type="button" class="modal-close" id="btnCloseTips" aria-label="Close dialog">&times;</button>
+    <h3 style="font-size: 1.45rem; color: var(--ink); margin-bottom: 0.5rem;" id="tipsModalTitle">
+      📸 Tips for 98%+ Leaf Accuracy
+    </h3>
+    <p style="color: var(--muted); font-size: 0.92rem; margin: 0;" id="tipsModalSub">
+      Pl@ntNet neural network performs best when leaf veins, margins, and petiole details are crisp and clear:
+    </p>
+    <ul class="tips-list">
+      <li>
+        <span style="font-size:1.2rem;">🍃</span>
+        <div><strong>Single Leaf Focus:</strong> Place a single whole leaf flat on a clean, high-contrast surface (white sheet, neutral table, or palm).</div>
+      </li>
+      <li>
+        <span style="font-size:1.2rem;">☀️</span>
+        <div><strong>Bright Diffused Light:</strong> Avoid strong direct sun glare or dark shadows. Morning indirect sunlight works best.</div>
+      </li>
+      <li>
+        <span style="font-size:1.2rem;">🔍</span>
+        <div><strong>Macro Venation:</strong> Ensure the leaf edges (serration) and internal veins are sharply in focus before shooting.</div>
+      </li>
+      <li>
+        <span style="font-size:1.2rem;">🚫</span>
+        <div><strong>Avoid Distractions:</strong> Do not include coins, whole trees, or multiple overlapping species in the frame.</div>
+      </li>
+    </ul>
+    <button type="button" class="btn-primary" style="width: 100%;" id="btnGotIt">Got It, Let's Scan!</button>
+  </div>
+</div>
+
+<!-- Live Camera Modal -->
+<div class="modal-backdrop" id="cameraModal">
+  <div class="modal-dialog">
+    <button type="button" class="modal-close" id="btnCloseCamera" aria-label="Close camera">&times;</button>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; padding-right:2rem;">
+      <h3 style="font-size: 1.35rem; color: var(--ink); margin:0;" id="cameraModalTitle">
+        📷 Live Camera Field Mode
+      </h3>
+      <button type="button" class="btn-action" id="btnFlipCamera" style="display:none; font-size:0.75rem; padding:0.25rem 0.55rem;" title="Switch between available cameras">
+        🔄 Flip Camera
+      </button>
+    </div>
+    <p id="cameraStatusText" style="color: var(--muted); font-size: 0.88rem; margin: 0;">
+      Align the leaf inside the frame and keep the camera steady:
+    </p>
+
+    <!-- Error notice container -->
+    <div id="cameraErrorBox" style="display:none; background:var(--alert-bg); border:1.5px solid var(--alert); border-radius:var(--radius-sm); padding:0.85rem 1rem; margin:1rem 0; color:var(--alert); font-size:0.88rem; text-align:left;">
+      <div style="font-weight:700; display:flex; align-items:center; gap:0.4rem;" id="cameraErrorTitle">
+        <span>⚠️</span> Camera Access Blocked
+      </div>
+      <p id="cameraErrorDesc" style="margin:0.35rem 0 0.75rem; line-height:1.45;"></p>
+      <button type="button" class="btn-secondary" id="btnCameraFallbackFile" style="width:100%; padding:0.6rem; font-size:0.85rem;">
+        📁 Choose a Photo from Files Instead
+      </button>
+    </div>
+    
+    <div class="camera-view-container" id="cameraViewContainer">
+      <video id="webcamVideo" autoplay playsinline muted></video>
+      <div class="camera-overlay-frame"></div>
+      <div id="cameraLoadingMsg" style="position:absolute; color:#fff; font-size:0.88rem; text-align:center; padding:1rem; pointer-events:none; z-index:5;">
+        <div class="spinner-leaf" style="width:34px; height:34px; border-color:rgba(255,255,255,0.25); border-top-color:#fff; margin:0 auto 0.6rem;"></div>
+        Starting camera feed...
+      </div>
+      <canvas id="cameraCanvas" style="display:none;"></canvas>
+    </div>
+
+    <div style="display: flex; gap: 0.75rem; margin-top:0.75rem;">
+      <button type="button" class="btn-primary" id="btnSnapPhoto" disabled>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+        <span id="btnSnapPhotoText">Capture Leaf Photo</span>
+      </button>
+      <button type="button" class="btn-secondary" id="btnCancelCamera">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Leaf Lightbox / Venation Magnifier Modal -->
+<div class="modal-backdrop" id="lightboxModal">
+  <div class="modal-dialog lightbox-dialog">
+    <button type="button" class="modal-close" id="btnCloseLightbox" aria-label="Close magnification">&times;</button>
+    <h3 id="lightboxTitle" style="font-size: 1.25rem; color: var(--ink); margin-bottom: 0.5rem;">
+      🔍 High-Resolution Leaf Venation
+    </h3>
+    <div class="lightbox-viewport">
+      <img id="lightboxImg" src="" alt="Magnified leaf">
+    </div>
+    <div class="lightbox-controls">
+      <button type="button" class="btn-action" id="btnZoomIn">➕ Zoom In</button>
+      <button type="button" class="btn-action" id="btnZoomOut">➖ Zoom Out</button>
+      <button type="button" class="btn-action" id="btnZoomReset">⟲ Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="toast-notice" id="toastNotice">
+  <span id="toastMsg">Notification message</span>
+</div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+
+  // ---------------- Internationalization (i18n) ----------------
+  const LANG_KEY = "leafid-lang";
+
+  const I18N = {
+    en: {
+      brand_sub: "AI Plant Classifier & Botanical Guide",
+      online_status: "Pl@ntNet Online",
+      tips_btn: "Photo Tips",
+      hero_tag: "AI Taxonomy & Wellness",
+      hero_title: "Identify Leaves & Discover Uses Instantly",
+      hero_desc: "Upload or snap a photo of any leaf to reveal the exact species, medicinal remedies, culinary applications, and plant care — right on this page.",
+      mount_title: "Specimen Mount",
+      mount_badge: "AI SCANNER",
+      drop_title: "Select or Drop Leaf Photo",
+      drop_desc: "Drag an image here, or tap to browse",
+      btn_live_cam: "Live Camera",
+      btn_identify: "Identify Leaf",
+      btn_clear: "Clear",
+      demo_label: "Demo Specimen",
+      demo_btn: "🌿 Demo Leaf Sample",
+      empty_title: "No Leaf Selected Yet",
+      empty_desc: "Choose or snap a leaf photo in the specimen mount to trigger instant identification and display all medicinal, culinary, and care benefits right here.",
+      loading_title: "Analyzing Leaf Specimen...",
+      loading_step1: "Extracting leaf venation & margin geometry...",
+      loading_step2: "Querying Pl@ntNet taxonomy neural network...",
+      loading_step3: "Compiling on-page medicinal, culinary & care benefits...",
+      share_btn: "📋 Share / Copy Summary",
+      print_btn: "🖨️ Print / Save Field Card (PDF)",
+      pronounce_btn: "🔊 Pronounce",
+      confidence_label: "Confidence Match",
+      family_label: "Family",
+      aliases_label: "Aliases",
+      your_leaf: "📸 Your Scanned Leaf",
+      live_specimen: "Live Specimen",
+      ref_leaf: "🌿 Pl@ntNet Reference Specimen",
+      verified_match: "Verified Match",
+      click_zoom: "🔍 Click to Zoom",
+      overview_title: "📖 Botanical Overview & Characteristics",
+      spec_sun: "Sunlight",
+      spec_water: "Watering",
+      spec_pet: "Pet Safety",
+      spec_type: "Plant Type",
+      benefits_title: "🌿 Uses, Benefits & Botanical Guide",
+      onpage_badge: "✨ Displayed on this page",
+      filter_all: "All Benefits",
+      filter_med: "💊 Medicinal",
+      filter_cul: "🍵 Culinary",
+      filter_dom: "🏡 Domestic",
+      filter_care: "🪴 Plant Care",
+      filter_caut: "⚠️ Cautions",
+      cat_med_title: "Medicinal & Health Benefits",
+      cat_cul_title: "Culinary & Nutritional Uses",
+      cat_dom_title: "Domestic & Air Purification",
+      cat_care_title: "Plant Care & Growing Guide",
+      cat_caut_title: "Cautions & Safety Advisory",
+      other_candidates: "🔍 Other Pl@ntNet Candidate Species",
+      lens_matches: "🌐 Google Lens Visual Matches",
+      recent_title: "📜 Recent Leaf Scans",
+      clear_history: "Clear History",
+      toast_copied: "✅ Botanical field report copied to clipboard!",
+      toast_captured: "📸 Photo captured! Ready to identify.",
+      camera_modal_title: "📷 Live Camera Field Mode",
+      camera_modal_status: "Align the leaf inside the frame and keep the camera steady:",
+      camera_snap_btn: "Capture Leaf Photo",
+      cancel_btn: "Cancel",
+      map_title: "🌍 Geographic Habitat & Growing Range",
+      map_badge: "Interactive Distribution Map",
+      map_native_range: "Native Origin Range",
+      map_climate: "Climate & Hardiness",
+      map_habitat: "Natural Habitat",
+      map_regions_label: "Active Growing Regions:",
+      map_reset: "Reset View",
+      native_badge: "Native Origin",
+      naturalized_badge: "Naturalized / Cultivated"
+    },
+    hi: {
+      brand_sub: "एआई पौधा पहचानकर्ता और वानस्पतिक गाइड",
+      online_status: "Pl@ntNet ऑनलाइन",
+      tips_btn: "फोटो टिप्स",
+      hero_tag: "एआई वर्गीकरण और स्वास्थ्य",
+      hero_title: "पत्तियों को पहचानें और तुरंत उपयोग जानें",
+      hero_desc: "किसी भी पत्ते की फोटो अपलोड करें या खींचें, और इस पृष्ठ पर ही सटीक प्रजाति, औषधीय उपाय, पाककला उपयोग और पौधों की देखभाल जानें।",
+      mount_title: "नमूना माउंट",
+      mount_badge: "एआई स्कैनर",
+      drop_title: "पत्ते की फोटो चुनें या ड्रॉप करें",
+      drop_desc: "यहाँ फोटो खींचें, या ब्राउज़ करने के लिए टैप करें",
+      btn_live_cam: "लाइव कैमरा",
+      btn_identify: "पत्ता पहचानें",
+      btn_clear: "हटाएं",
+      demo_label: "डेमो नमूना",
+      demo_btn: "🌿 डेमो पत्ता नमूना",
+      empty_title: "अभी तक कोई पत्ता नहीं चुना गया",
+      empty_desc: "तत्काल पहचान के लिए नमूना माउंट में एक पत्ते की फोटो चुनें या लें और सभी औषधीय, पाककला और देखभाल लाभ यहीं देखें।",
+      loading_title: "पत्ते के नमूने का विश्लेषण किया जा रहा है...",
+      loading_step1: "पत्तियों की शिराओं और संरचना का विश्लेषण हो रहा है...",
+      loading_step2: "Pl@ntNet वर्गीकरण नेटवर्क से मिलान किया जा रहा है...",
+      loading_step3: "औषधीय, पाककला और देखभाल लाभ तैयार किए जा रहे हैं...",
+      share_btn: "📋 सारांश शेयर / कॉपी करें",
+      print_btn: "🖨️ फील्ड कार्ड प्रिंट / पीडीएफ सहेजें",
+      pronounce_btn: "🔊 उच्चारण सुनें",
+      confidence_label: "सटीकता मिलान",
+      family_label: "कुल (Family)",
+      aliases_label: "अन्य नाम",
+      your_leaf: "📸 आपकी स्कैन की गई पत्ती",
+      live_specimen: "लाइव नमूना",
+      ref_leaf: "🌿 Pl@ntNet संदर्भ नमूना",
+      verified_match: "सत्यापित मिलान",
+      click_zoom: "🔍 बड़ा करके देखने के लिए क्लिक करें",
+      overview_title: "📖 वानस्पतिक विवरण और विशेषताएं",
+      spec_sun: "धूप",
+      spec_water: "पानी",
+      spec_pet: "पालतू सुरक्षा",
+      spec_type: "पौधे का प्रकार",
+      benefits_title: "🌿 उपयोग, लाभ और वानस्पतिक गाइड",
+      onpage_badge: "✨ इसी पृष्ठ पर प्रदर्शित",
+      filter_all: "सभी लाभ",
+      filter_med: "💊 औषधीय",
+      filter_cul: "🍵 पाककला",
+      filter_dom: "🏡 घरेलू",
+      filter_care: "🪴 देखभाल",
+      filter_caut: "⚠️ सावधानियां",
+      cat_med_title: "औषधीय और स्वास्थ्य लाभ",
+      cat_cul_title: "पाककला और पोषण संबंधी उपयोग",
+      cat_dom_title: "घरेलू और वायु शुद्धिकरण उपयोग",
+      cat_care_title: "पौधों की देखभाल और उगाने की मार्गदर्शिका",
+      cat_caut_title: "सावधानियां और सुरक्षा सलाह",
+      other_candidates: "🔍 अन्य संभावित प्रजातियां",
+      lens_matches: "🌐 Google Lens दृश्य मिलान",
+      recent_title: "📜 हाल ही में स्कैन किए गए पत्ते",
+      clear_history: "इतिहास मिटाएं",
+      toast_copied: "✅ वानस्पतिक रिपोर्ट क्लिपबोर्ड पर कॉपी हो गई!",
+      toast_captured: "📸 फोटो ले ली गई! पहचान के लिए तैयार।",
+      camera_modal_title: "📷 लाइव कैमरा मोड",
+      camera_modal_status: "पत्ते को फ्रेम के अंदर रखें और कैमरे को स्थिर रखें:",
+      camera_snap_btn: "पत्ते की फोटो लें",
+      cancel_btn: "रद्द करें"
+    },
+    ta: {
+      brand_sub: "AI தாவர அடையாளங்காட்டி & தாவரவியல் வழிகாட்டி",
+      online_status: "Pl@ntNet ஆன்லைன்",
+      tips_btn: "புகைப்பட குறிப்புகள்",
+      hero_tag: "AI வகைப்பாடு & ஆரோக்கியம்",
+      hero_title: "இலைகளை அடையாளம் கண்டு உடனே பயன்களை அறியவும்",
+      hero_desc: "எந்தவொரு இலையின் புகைப்படத்தையும் பதிவேற்றவும் அல்லது படம் எடுக்கவும், அதன் சரியான இனம், மருத்துவ பயன்கள், சமையல் முறைகள் மற்றும் தாவர பராமரிப்பை இந்த பக்கத்திலேயே உடனடியாக அறியலாம்.",
+      mount_title: "மாதிரி மவுண்ட்",
+      mount_badge: "AI ஸ்கேனர்",
+      drop_title: "இலை புகைப்படத்தைத் தேர்ந்தெடுக்கவும் அல்லது விடவும்",
+      drop_desc: "படத்தை இங்கே இழுக்கவும், அல்லது உலாவ தட்டவும்",
+      btn_live_cam: "நேரடி கேமரா",
+      btn_identify: "இலையை அடையாளம் காண்க",
+      btn_clear: "அழி",
+      demo_label: "டெமோ மாதிரி",
+      demo_btn: "🌿 டெமோ இலை மாதிரி",
+      empty_title: "இன்னும் இலை தேர்ந்தெடுக்கப்படவில்லை",
+      empty_desc: "உடனடி அடையாளத்தைக் காண மாதிரி மவுண்டில் ஒரு இலையின் புகைப்படத்தைத் தேர்வுசெய்து அல்லது எடுக்கவும், அனைத்து மருத்துவ, சமையல் மற்றும் பராமரிப்பு நன்மைகளையும் இங்கேயே காண்க.",
+      loading_title: "இலை மாதிரி பகுப்பாய்வு செய்யப்படுகிறது...",
+      loading_step1: "இலை நரம்பமைவு மற்றும் வடிவவியலை பகுப்பாய்வு செய்கிறது...",
+      loading_step2: "Pl@ntNet வகைப்பாடு நெட்வொர்க்கில் சரிபார்க்கிறது...",
+      loading_step3: "மருத்துவ, சமையல் மற்றும் பராமரிப்பு நன்மைகளைத் தொகுக்கிறது...",
+      share_btn: "📋 சுருக்கத்தைப் பகிரவும் / நகலெடுக்கவும்",
+      print_btn: "🖨️ ஃபீல்ட் கார்டு அச்சிடு / PDF சேமி",
+      pronounce_btn: "🔊 உச்சரிப்பைக் கேளுங்கள்",
+      confidence_label: "பொருத்த துல்லியம்",
+      family_label: "குடும்பம் (Family)",
+      aliases_label: "மாற்றுப் பெயர்கள்",
+      your_leaf: "📸 உங்கள் ஸ்கேன் செய்யப்பட்ட இலை",
+      live_specimen: "நேரடி மாதிரி",
+      ref_leaf: "🌿 Pl@ntNet குறிப்பு மாதிரி",
+      verified_match: "சரிபார்க்கப்பட்ட பொருத்தம்",
+      click_zoom: "🔍 பெரிதாக்க கிளிக் செய்யவும்",
+      overview_title: "📖 தாவரவியல் கண்ணோட்டம் & சிறப்பியல்புகள்",
+      spec_sun: "சூரிய ஒளி",
+      spec_water: "நீர்ப்பாசனம்",
+      spec_pet: "செல்லப்பிராணி பாதுகாப்பு",
+      spec_type: "தாவர வகை",
+      benefits_title: "🌿 பயன்கள், நன்மைகள் & தாவரவியல் வழிகாட்டி",
+      onpage_badge: "✨ இந்த பக்கத்திலேயே காட்டப்படுகிறது",
+      filter_all: "அனைத்து நன்மைகள்",
+      filter_med: "💊 மருத்துவம்",
+      filter_cul: "🍵 சமையல்",
+      filter_dom: "🏡 வீட்டு உபயோகம்",
+      filter_care: "🪴 பராமரிப்பு",
+      filter_caut: "⚠️ எச்சரிக்கைகள்",
+      cat_med_title: "மருத்துவ மற்றும் சுகாதார நன்மைகள்",
+      cat_cul_title: "சமையல் மற்றும் ஊட்டச்சத்து பயன்கள்",
+      cat_dom_title: "வீட்டு உபயோகம் மற்றும் காற்று சுத்திகரிப்பு",
+      cat_care_title: "தாவர பராமரிப்பு மற்றும் வளர்ப்பு வழிகாட்டி",
+      cat_caut_title: "எச்சரிக்கைகள் மற்றும் பாதுகாப்பு வழிகாட்டல்",
+      other_candidates: "🔍 பிற சாத்தியமான தாவர இனங்கள்",
+      lens_matches: "🌐 Google Lens காட்சி பொருத்தங்கள்",
+      recent_title: "📜 சமீபத்திய இலை ஸ்கேன்கள்",
+      clear_history: "வரலாற்றை அழி",
+      toast_copied: "✅ தாவரவியல் அறிக்கை நகலெடுக்கப்பட்டது!",
+      toast_captured: "📸 புகைப்படம் எடுக்கப்பட்டது! அடையாளம் காணத் தயார்.",
+      camera_modal_title: "📷 நேரடி கேமரா முறை",
+      camera_modal_status: "இலையை வட்டத்திற்குள் வைத்து கேமராவை அசைக்காமல் வைக்கவும்:",
+      camera_snap_btn: "இலை புகைப்படம் எடு",
+      cancel_btn: "ரத்து செய்"
+    },
+    te: {
+      brand_sub: "AI మొక్కల గుర్తింపు & వృక్షశాస్త్ర మార్గదర్శి",
+      online_status: "Pl@ntNet ఆన్‌లైన్",
+      tips_btn: "ఫోటో చిట్కాలు",
+      hero_tag: "AI వర్గీకరణ & ఆరోగ్యం",
+      hero_title: "ఆకులను గుర్తించి తక్షణమే ఉపయోగాలు తెలుసుకోండి",
+      hero_desc: "ఏదైనా ఆకు ఫోటోను అప్‌లోడ్ చేయండి లేదా తీయండి, మరియు ఖచ్చితమైన జాతి, ఔషధ నివారణలు, వంట ఉపయోగాలు మరియు మొక్కల సంరక్షణను ఈ పేజీలోనే తక్షణమే తెలుసుకోండి.",
+      mount_title: "నమూనా మౌంట్",
+      mount_badge: "AI స్కానర్",
+      drop_title: "ఆకు ఫోటోను ఎంచుకోండి లేదా డ్రాప్ చేయండి",
+      drop_desc: "చిత్రాన్ని ఇక్కడ లాగండి లేదా బ్రౌజ్ చేయడానికి నొక్కండి",
+      btn_live_cam: "లైవ్ కెమెరా",
+      btn_identify: "ఆకును గుర్తించండి",
+      btn_clear: "క్లియర్",
+      demo_label: "డెమో నమూనా",
+      demo_btn: "🌿 డెమో ఆకు నమూనా",
+      empty_title: "ఇంకా ఆకు ఎంపిక చేయలేదు",
+      empty_desc: "తక్షణ గుర్తింపు కోసం నమూనా మౌంట్‌లో ఆకు ఫోటోను ఎంచుకోండి లేదా తీయండి, మరియు అన్ని ఔషధ, వంట మరియు సంరక్షణ ప్రయోజనాలను ఇక్కడే చూడండి.",
+      loading_title: "ఆకు నమూనా విశ్లేషించబడుతోంది...",
+      loading_step1: "ఆకు ఈనెలు మరియు నిర్మాణాన్ని విశ్లేషిస్తోంది...",
+      loading_step2: "Pl@ntNet వర్గీకరణ నెట్‌వర్క్‌తో సరిపోల్చుతోంది...",
+      loading_step3: "ఔషధ, వంట మరియు సంరక్షణ ప్రయోజనాలను క్రోడీకరిస్తోంది...",
+      share_btn: "📋 సారాంశాన్ని భాగస్వామ్యం / కాపీ చేయండి",
+      print_btn: "🖨️ ఫీల్డ్ కార్డును ప్రింట్ / PDF సేవ్ చేయండి",
+      pronounce_btn: "🔊 ఉచ్చారణ వినండి",
+      confidence_label: "ఖచ్చితత్వ సరిపోలిక",
+      family_label: "కుటుంబం (Family)",
+      aliases_label: "ఇతర పేర్లు",
+      your_leaf: "📸 మీ స్కాన్ చేసిన ఆకు",
+      live_specimen: "లైవ్ నమూనా",
+      ref_leaf: "🌿 Pl@ntNet సూచన నమూనా",
+      verified_match: "ధృవీకరించబడిన సరిపోలిక",
+      click_zoom: "🔍 జూమ్ చేయడానికి క్లిక్ చేయండి",
+      overview_title: "📖 వృక్షశాస్త్ర అవలోకనం & లక్షణాలు",
+      spec_sun: "సూర్యకాంతి",
+      spec_water: "నీరు",
+      spec_pet: "పెంపుడు జంతువుల భద్రత",
+      spec_type: "మొక్క రకం",
+      benefits_title: "🌿 ఉపయోగాలు, ప్రయోజనాలు & వృక్షశాస్త్ర మార్గదర్శి",
+      onpage_badge: "✨ ఈ పేజీలోనే ప్రదర్శించబడింది",
+      filter_all: "అన్ని ప్రయోజనాలు",
+      filter_med: "💊 ఔషధం",
+      filter_cul: "🍵 వంట",
+      filter_dom: "🏡 గృహ",
+      filter_care: "🪴 సంరక్షణ",
+      filter_caut: "⚠️ హెచ్చరికలు",
+      cat_med_title: "ఔషధ మరియు ఆరోగ్య ప్రయోజనాలు",
+      cat_cul_title: "వంట మరియు పోషక ఉపయోగాలు",
+      cat_dom_title: "గృహ మరియు గాలి శుద్దీకరణ ఉపయోగాలు",
+      cat_care_title: "మొక్కల సంరక్షణ మరియు పెరుగుదల మార్గదర్శి",
+      cat_caut_title: "హెచ్చరికలు మరియు భద్రతా సలహా",
+      other_candidates: "🔍 ఇతర సంభావ్య జాతులు",
+      lens_matches: "🌐 Google Lens దృశ్య సరిపోలికలు",
+      recent_title: "📜 ఇటీవలి ఆకు స్కాన్‌లు",
+      clear_history: "చరిత్రను క్లియర్ చేయండి",
+      toast_copied: "✅ వృక్షశాస్త్ర నివేదిక క్లిప్‌బోర్డ్‌కు కాపీ చేయబడింది!",
+      toast_captured: "📸 ఫోటో తీయబడింది! గుర్తించడానికి సిద్ధం.",
+      camera_modal_title: "📷 లైవ్ కెమెరా మోడ్",
+      camera_modal_status: "ఆకును ఫ్రేమ్ లోపల ఉంచి కెమెరాను స్థిరంగా ఉంచండి:",
+      camera_snap_btn: "ఆకు ఫోటో తీయండి",
+      cancel_btn: "రద్దు చేయండి"
+    }
+  };
+
+  // Common Indian plant native names
+  const NATIVE_PLANT_NAMES = {
+    "ocimum tenuiflorum": { hi: "तुलसी (Holy Basil)", ta: "துளசி", te: "తులసి" },
+    "ocimum basilicum": { hi: "मीठी तुलसी (Sweet Basil)", ta: "திருநீற்றுப்பச்சிலை", te: "రుద్రజడ" },
+    "azadirachta indica": { hi: "नीम (Neem)", ta: "வேப்ப மரம்", te: "వేప చెట్టు" },
+    "mangifera indica": { hi: "आम (Mango)", ta: "மாமரம்", te: "మామిడి" },
+    "hibiscus rosa-sinensis": { hi: "गुड़हल (Hibiscus)", ta: "செம்பருத்தி", te: "మందార" },
+    "ficus elastica": { hi: "रबर का पौधा (Rubber Plant)", ta: "ரப்பர் மரம்", te: "రబ్బరు మొక్క" },
+    "ficus religiosa": { hi: "पीपल (Sacred Fig)", ta: "அரச மரம்", te: "రావి చెట్టు" },
+    "ficus benghalensis": { hi: "बरगद (Banyan)", ta: "ஆலமரம்", te: "మర్రి చెట్టు" },
+    "curcuma longa": { hi: "हल्दी (Turmeric)", ta: "மஞ்சள்", te: "పసుపు" },
+    "zingiber officinale": { hi: "अदरक (Ginger)", ta: "இஞ்சி", te: "అల్లం" },
+    "mentha": { hi: "पुदीना (Mint)", ta: "புதினா", te: "పుదీనా" },
+    "aloe vera": { hi: "घृतकुमारी / एलोवेरा", ta: "சோற்றுக்கற்றாழை", te: "కలబంద" },
+    "murraya koenigii": { hi: "कढ़ी पत्ता (Curry Leaf)", ta: "கருவேப்பிலை", te: "కరివేపాకు" },
+    "moringa oleifera": { hi: "सहजन / मोरिंगा (Drumstick)", ta: "முருங்கை", te: "మునగ" },
+    "monstera deliciosa": { hi: "मॉन्स्टेरा", ta: "மான்ஸ்டெரா", te: "మాన్‌స్టెరా" },
+    "rosa": { hi: "गुलाब (Rose)", ta: "ரோஜா", te: "గులాబీ" },
+    "citrus": { hi: "नींबू / संतरा", ta: "எலுமிச்சை", te: "నిమ్మ" },
+    "coriandrum sativum": { hi: "धनिया (Coriander)", ta: "கொத்தமல்லி", te: "కొత్తిమీర" },
+    "piper betle": { hi: "पान का पत्ता (Betel Leaf)", ta: "வெற்றிலை", te: "తమలపాకు" },
+    "withania somnifera": { hi: "अश्वगंधा (Ashwagandha)", ta: "அமுக்கிரா", te: "అశ్వగంధ" },
+    "sansevieria trifasciata": { hi: "स्नेक प्लांट", ta: "பாம்பு செடி", te: "పాము మొక్క" },
+    "epipremnum aureum": { hi: "मनी प्लांट (Money Plant)", ta: "மணி பிளாண்ட்", te: "మనీ ప్లాంట్" },
+    "bidens pilosa": { hi: "ब्लैक जैक / चिड़चिड़ा", ta: "முட்கொத்து", te: "బైడెన్స్ పిలోసా" }
+  };
+
+  let currentLang = localStorage.getItem(LANG_KEY) || "en";
+  let lastResultData = null;
+
+  function t(key) {
+    const dict = I18N[currentLang] || I18N.en;
+    return dict[key] || I18N.en[key] || key;
+  }
+
+  function getNativeName(sciName, lang) {
+    if (!sciName) return null;
+    const lower = sciName.toLowerCase();
+    for (const [key, mapping] of Object.entries(NATIVE_PLANT_NAMES)) {
+      if (lower.includes(key) || key.includes(lower)) {
+        return mapping[lang] || null;
+      }
+    }
+    return null;
+  }
+
+  function applyLanguage(lang) {
+    currentLang = lang;
+    localStorage.setItem(LANG_KEY, lang);
+    document.documentElement.lang = lang;
+    $("langSelect").value = lang;
+
+    // Update all static UI elements with data-i18n
+    document.querySelectorAll("[data-i18n]").forEach((node) => {
+      const key = node.getAttribute("data-i18n");
+      const translation = t(key);
+      if (translation) {
+        node.textContent = translation;
+      }
+    });
+
+    // Update placeholders and dynamic elements
+    $("btnSnapPhotoText").textContent = t("camera_snap_btn");
+    $("cameraStatusText").textContent = t("camera_modal_status");
+
+    // Re-render current results if on screen
+    if (lastResultData) {
+      renderResults(lastResultData);
+    }
+    renderRecentScans();
+  }
+
+  $("langSelect").addEventListener("change", (e) => {
+    applyLanguage(e.target.value);
+    showToast(`🌐 ${$("langSelect").options[$("langSelect").selectedIndex].text}`);
+  });
+
+  // Initialize Language
+  applyLanguage(currentLang);
+
+  // ---------------- Theme Management ----------------
+  const THEME_KEY = "leafid-theme";
+  function applyTheme(themeName) {
+    document.documentElement.setAttribute("data-theme", themeName);
+    localStorage.setItem(THEME_KEY, themeName);
+    document.querySelectorAll(".theme-btn").forEach((btn) => {
+      btn.classList.toggle("active", btn.getAttribute("data-theme-set") === themeName);
+    });
+  }
+
+  const initialTheme = localStorage.getItem(THEME_KEY) || "forest";
+  applyTheme(initialTheme);
+
+  document.querySelectorAll(".theme-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const theme = btn.getAttribute("data-theme-set");
+      applyTheme(theme);
+    });
+  });
+
+  // ---------------- Toast Notification ----------------
+  function showToast(msg) {
+    const toast = $("toastNotice");
+    $("toastMsg").textContent = msg;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 2800);
+  }
+
+  // ---------------- Modal Handlers (Tips) ----------------
+  $("btn-tips").addEventListener("click", () => $("tipsModal").classList.add("open"));
+  $("btnCloseTips").addEventListener("click", () => $("tipsModal").classList.remove("open"));
+  $("btnGotIt").addEventListener("click", () => $("tipsModal").classList.remove("open"));
+  $("tipsModal").addEventListener("click", (e) => {
+    if (e.target === $("tipsModal")) $("tipsModal").classList.remove("open");
+  });
+
+  // ---------------- Live Camera Capture ----------------
+  let mediaStream = null;
+  let videoDevices = [];
+  let currentDeviceIndex = 0;
+
+  async function getAvailableCameras() {
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return [];
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      return devices.filter((d) => d.kind === "videoinput");
+    } catch {
+      return [];
+    }
+  }
+
+  async function openCameraStream(preferredDeviceId = null) {
+    $("cameraErrorBox").style.display = "none";
+    $("cameraViewContainer").style.display = "grid";
+    $("cameraLoadingMsg").style.display = "block";
+    $("cameraLoadingMsg").innerHTML = `
+      <div class="spinner-leaf" style="width:34px; height:34px; border-color:rgba(255,255,255,0.25); border-top-color:#fff; margin:0 auto 0.6rem;"></div>
+      Connecting to camera feed...
+    `;
+    $("btnSnapPhoto").disabled = true;
+    $("cameraStatusText").textContent = "Requesting camera access...";
+
+    if (mediaStream) {
+      mediaStream.getTracks().forEach((track) => track.stop());
+      mediaStream = null;
+    }
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      showCameraError(
+        "Camera Not Supported",
+        "Your browser does not support live camera capture or is restricting camera permissions. You can select a photo from your computer or phone files."
+      );
+      return;
+    }
+
+    const constraintsList = [];
+    if (preferredDeviceId) {
+      constraintsList.push({ video: { deviceId: { exact: preferredDeviceId } } });
+    }
+    constraintsList.push({ video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 } } });
+    constraintsList.push({ video: { facingMode: "user" } });
+    constraintsList.push({ video: true });
+
+    let stream = null;
+    let lastError = null;
+
+    for (const constraints of constraintsList) {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+        if (stream) break;
+      } catch (err) {
+        lastError = err;
+      }
+    }
+
+    if (!stream) {
+      let title = "Camera Access Error";
+      let desc = "Could not activate the camera feed.";
+
+      if (lastError && (lastError.name === "NotAllowedError" || lastError.name === "PermissionDeniedError")) {
+        title = "Camera Permission Denied";
+        desc = "Camera permission was blocked. Please click the camera or lock icon in your browser's address bar to allow camera access for this page, then try again.";
+      } else if (lastError && (lastError.name === "NotFoundError" || lastError.name === "DevicesNotFoundError")) {
+        title = "No Camera Detected";
+        desc = "No camera hardware was found on this system. Please check your webcam connection or upload a photo directly.";
+      } else if (lastError && (lastError.name === "NotReadableError" || lastError.name === "TrackStartError")) {
+        title = "Camera Already in Use";
+        desc = "Your webcam is currently being used by another application (e.g. Zoom, Microsoft Teams, or another browser tab). Please close other apps and try again.";
+      } else if (lastError && lastError.message) {
+        desc = lastError.message;
+      }
+
+      showCameraError(title, desc);
+      return;
+    }
+
+    mediaStream = stream;
+    const video = $("webcamVideo");
+    video.srcObject = stream;
+    video.muted = true;
+    video.playsInline = true;
+
+    try {
+      await video.play();
+    } catch (e) {
+      console.warn("video.play() initial warning:", e);
+    }
+
+    video.onloadedmetadata = () => {
+      video.play().catch(() => {});
+      $("cameraLoadingMsg").style.display = "none";
+      $("btnSnapPhoto").disabled = false;
+      $("cameraStatusText").textContent = t("camera_modal_status");
+    };
+
+    setTimeout(() => {
+      if (video.readyState >= 2) {
+        $("cameraLoadingMsg").style.display = "none";
+        $("btnSnapPhoto").disabled = false;
+        $("cameraStatusText").textContent = t("camera_modal_status");
+      }
+    }, 600);
+
+    videoDevices = await getAvailableCameras();
+    if (videoDevices.length > 1) {
+      $("btnFlipCamera").style.display = "inline-flex";
+    } else {
+      $("btnFlipCamera").style.display = "none";
+    }
+  }
+
+  function showCameraError(title, desc) {
+    $("cameraLoadingMsg").style.display = "none";
+    $("cameraViewContainer").style.display = "none";
+    $("btnSnapPhoto").disabled = true;
+    $("cameraErrorTitle").innerHTML = "<span>⚠️</span> " + title;
+    $("cameraErrorDesc").textContent = desc;
+    $("cameraErrorBox").style.display = "block";
+    $("cameraStatusText").textContent = "Camera could not be activated.";
+  }
+
+  function stopCamera() {
+    if (mediaStream) {
+      mediaStream.getTracks().forEach((track) => track.stop());
+      mediaStream = null;
+    }
+    const video = $("webcamVideo");
+    if (video) video.srcObject = null;
+    $("cameraModal").classList.remove("open");
+  }
+
+  $("btnLiveCam").addEventListener("click", () => {
+    $("cameraModal").classList.add("open");
+    openCameraStream();
+  });
+
+  $("btnFlipCamera").addEventListener("click", () => {
+    if (videoDevices.length > 1) {
+      currentDeviceIndex = (currentDeviceIndex + 1) % videoDevices.length;
+      openCameraStream(videoDevices[currentDeviceIndex].deviceId);
+    }
+  });
+
+  $("btnCameraFallbackFile").addEventListener("click", () => {
+    stopCamera();
+    $("fileInput").click();
+  });
+
+  $("btnCloseCamera").addEventListener("click", stopCamera);
+  $("btnCancelCamera").addEventListener("click", stopCamera);
+  $("cameraModal").addEventListener("click", (e) => {
+    if (e.target === $("cameraModal")) stopCamera();
+  });
+
+  $("btnSnapPhoto").addEventListener("click", () => {
+    const video = $("webcamVideo");
+    const canvas = $("cameraCanvas");
+    if (!video || !video.videoWidth) {
+      showToast("Waiting for camera feed...");
+      return;
+    }
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        showToast("Error capturing frame from camera.");
+        return;
+      }
+      const file = new File([blob], "camera_leaf_" + Date.now() + ".jpg", { type: "image/jpeg" });
+      handleFileSelected(file);
+      stopCamera();
+      showToast(t("toast_captured"));
+    }, "image/jpeg", 0.92);
+  });
+
+  $("cameraDirectInput").addEventListener("change", (e) => {
+    if (e.target.files && e.target.files[0]) {
+      handleFileSelected(e.target.files[0]);
+    }
+  });
+
+  // ---------------- Lightbox Magnifier ----------------
+  let currentZoom = 1;
+  function openLightbox(src, title) {
+    currentZoom = 1;
+    const img = $("lightboxImg");
+    img.src = src;
+    img.style.transform = "scale(1)";
+    $("lightboxTitle").textContent = "🔍 " + (title || "Leaf Venation Magnifier");
+    $("lightboxModal").classList.add("open");
+  }
+  function closeLightbox() {
+    $("lightboxModal").classList.remove("open");
+  }
+  $("btnCloseLightbox").addEventListener("click", closeLightbox);
+  $("lightboxModal").addEventListener("click", (e) => {
+    if (e.target === $("lightboxModal")) closeLightbox();
+  });
+  $("btnZoomIn").addEventListener("click", () => {
+    currentZoom = Math.min(3, currentZoom + 0.35);
+    $("lightboxImg").style.transform = `scale(${currentZoom})`;
+  });
+  $("btnZoomOut").addEventListener("click", () => {
+    currentZoom = Math.max(0.7, currentZoom - 0.35);
+    $("lightboxImg").style.transform = `scale(${currentZoom})`;
+  });
+  $("btnZoomReset").addEventListener("click", () => {
+    currentZoom = 1;
+    $("lightboxImg").style.transform = "scale(1)";
+  });
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeLightbox();
+      stopCamera();
+      $("tipsModal").classList.remove("open");
+    }
+  });
+
+  // ---------------- Multilingual Pronunciation ----------------
+  function speakBotanicalName(scientificName, displayName) {
+    if (!("speechSynthesis" in window)) {
+      showToast("Speech synthesis not supported in this browser.");
+      return;
+    }
+    window.speechSynthesis.cancel();
+    const btn = document.querySelector(".btn-pronounce");
+    if (btn) btn.classList.add("speaking");
+
+    let text = `${scientificName}. Commonly known as ${displayName}.`;
+    let voiceLang = "en-US";
+    if (currentLang === "hi") {
+      text = `${displayName}. वैज्ञानिक नाम ${scientificName}.`;
+      voiceLang = "hi-IN";
+    } else if (currentLang === "ta") {
+      text = `${displayName}. தாவரவியல் பெயர் ${scientificName}.`;
+      voiceLang = "ta-IN";
+    } else if (currentLang === "te") {
+      text = `${displayName}. శాస్త్రీయ నామం ${scientificName}.`;
+      voiceLang = "te-IN";
+    }
+
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = voiceLang;
+    utter.rate = 0.88;
+    utter.pitch = 1.0;
+    utter.onend = () => { if (btn) btn.classList.remove("speaking"); };
+    utter.onerror = () => { if (btn) btn.classList.remove("speaking"); };
+    window.speechSynthesis.speak(utter);
+  }
+
+  // ---------------- Recent Scans Storage ----------------
+  const RECENT_KEY = "leafid-recent-scans";
+  function getRecentScans() {
+    try {
+      return JSON.parse(localStorage.getItem(RECENT_KEY)) || [];
+    } catch {
+      return [];
+    }
+  }
+  function saveRecentScan(item) {
+    const list = getRecentScans().filter((x) => x.name !== item.name);
+    list.unshift(item);
+    if (list.length > 6) list.pop();
+    localStorage.setItem(RECENT_KEY, JSON.stringify(list));
+    renderRecentScans();
+  }
+  function renderRecentScans() {
+    const list = getRecentScans();
+    const container = $("recentScansContainer");
+    const grid = $("recentGrid");
+    if (!list.length) {
+      container.style.display = "none";
+      return;
+    }
+    container.style.display = "block";
+    grid.innerHTML = "";
+    list.forEach((item) => {
+      const displayName = (currentLang !== "en" && getNativeName(item.sci, currentLang)) || item.name;
+      const elItem = el("div", { className: "recent-item" },
+        el("img", { className: "recent-thumb", src: item.thumb, alt: item.name }),
+        el("div", { className: "recent-body" },
+          el("div", { className: "recent-name", title: displayName }, displayName),
+          el("div", { className: "recent-sub" },
+            el("span", {}, item.sci),
+            el("b", { style: "color:var(--accent)" }, item.confidence + "%")
+          )
+        )
+      );
+      elItem.addEventListener("click", () => {
+        if (item.data) {
+          previewUrl = item.thumb;
+          renderResults(item.data);
+          window.scrollTo({ top: $("resultsPane").offsetTop - 80, behavior: "smooth" });
+        }
+      });
+      grid.appendChild(elItem);
+    });
+  }
+  $("btnClearRecent").addEventListener("click", () => {
+    localStorage.removeItem(RECENT_KEY);
+    renderRecentScans();
+    showToast(t("clear_history"));
+  });
+
+  // ---------------- File Selection & Preview ----------------
+  let selectedFile = null;
+  let previewUrl = null;
+
+  function el(tag, props = {}, ...children) {
+    const node = document.createElement(tag);
+    Object.assign(node, props);
+    children.flat().forEach((c) => {
+      if (typeof c === "string") {
+        node.appendChild(document.createTextNode(c));
+      } else if (c instanceof Node) {
+        node.appendChild(c);
+      }
+    });
+    return node;
+  }
+
+  function handleFileSelected(file) {
+    selectedFile = file;
+    $("btnIdentify").disabled = !file;
+
+    const drop = $("dropContent");
+    drop.innerHTML = "";
+
+    if (!file) {
+      if (previewUrl && previewUrl.startsWith("blob:")) URL.revokeObjectURL(previewUrl);
+      previewUrl = null;
+      $("fileInput").value = "";
+      drop.innerHTML = `
+        <div class="drop-icon">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+            <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+          </svg>
+        </div>
+        <h4 class="drop-title">${t("drop_title")}</h4>
+        <p class="drop-desc">${t("drop_desc")}</p>
+        <span class="drop-pill">JPG, PNG, WEBP • Max 8MB</span>
+      `;
+      $("resultsPane").innerHTML = `
+        <div class="placeholder-card" id="emptyPlaceholder">
+          <div class="placeholder-icon">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+            </svg>
+          </div>
+          <h3>${t("empty_title")}</h3>
+          <p>${t("empty_desc")}</p>
+        </div>
+      `;
+      return;
+    }
+
+    previewUrl = URL.createObjectURL(file);
+    const wrap = el("div", { className: "preview-wrapper" });
+    const img = el("img", { className: "preview-image", src: previewUrl, alt: "Leaf specimen" });
+    const overlay = el("div", { className: "preview-overlay" },
+      el("span", {}, "🌿 " + file.name),
+      el("span", {}, Math.round(file.size / 1024) + " KB")
+    );
+    wrap.append(img, overlay);
+    drop.append(wrap);
+  }
+
+  $("fileInput").addEventListener("change", (e) => {
+    if (e.target.files && e.target.files[0]) {
+      handleFileSelected(e.target.files[0]);
+    }
+  });
+
+  $("btnClear").addEventListener("click", () => handleFileSelected(null));
+
+  // Drag and drop handlers
+  const dropzone = $("dropzone");
+  ["dragenter", "dragover"].forEach((eventName) => {
+    dropzone.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      dropzone.classList.add("drag-active");
+    });
+  });
+  ["dragleave", "drop"].forEach((eventName) => {
+    dropzone.addEventListener(eventName, () => {
+      dropzone.classList.remove("drag-active");
+    });
+  });
+  dropzone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFileSelected(e.dataTransfer.files[0]);
+    }
+  });
+
+  // Demo leaf sample
+  $("btnSampleLeaf").addEventListener("click", async () => {
+    try {
+      const res = await fetch("/static/samples/sample_leaf.jpg");
+      const blob = await res.blob();
+      const file = new File([blob], "sample_leaf.jpg", { type: "image/jpeg" });
+      handleFileSelected(file);
+      $("btnIdentify").click();
+    } catch (err) {
+      console.error("Could not load sample", err);
+    }
+  });
+
+  // ---------------- Identify API Call ----------------
+  $("btnIdentify").addEventListener("click", async () => {
+    if (!selectedFile) return;
+
+    $("btnIdentify").disabled = true;
+    $("resultsPane").innerHTML = `
+      <div class="loading-card">
+        <div class="spinner-leaf"></div>
+        <h3 class="loading-title">${t("loading_title")}</h3>
+        <p class="loading-step" id="loadingStepMsg">${t("loading_step1")}</p>
+      </div>
+    `;
+
+    const stepTimer = setTimeout(() => {
+      const step = $("loadingStepMsg");
+      if (step) step.textContent = t("loading_step2");
+    }, 1200);
+
+    const stepTimer2 = setTimeout(() => {
+      const step = $("loadingStepMsg");
+      if (step) step.textContent = t("loading_step3");
+    }, 2800);
+
+    const formData = new FormData();
+    formData.append("image", selectedFile);
+
+    try {
+      const res = await fetch("/api/identify", { method: "POST", body: formData });
+      clearTimeout(stepTimer);
+      clearTimeout(stepTimer2);
+      const data = await res.json();
+      if (data.ok) {
+        lastResultData = data;
+        renderResults(data);
+
+        // Save to recent scans with thumbnail
+        const p = data.plant;
+        saveRecentScan({
+          name: p.common_names && p.common_names.length ? p.common_names[0] : p.scientific_name,
+          sci: p.scientific_name,
+          confidence: p.confidence,
+          thumb: previewUrl || p.reference_image,
+          time: new Date().toLocaleDateString(),
+          data: data
+        });
+      } else {
+        renderError(data.message || "Upload the image of leaf only.");
+      }
+    } catch (err) {
+      clearTimeout(stepTimer);
+      clearTimeout(stepTimer2);
+      renderError("Failed to communicate with the classification server. Please check your connection.");
+    } finally {
+      $("btnIdentify").disabled = false;
+    }
+  });
+
+  function renderError(message) {
+    $("resultsPane").innerHTML = `
+      <div class="notice-banner">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0; margin-top:2px;">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <div>
+          <h4>Identification Notice</h4>
+          <p>${message}</p>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderResults(data) {
+    lastResultData = data;
+    const p = data.plant;
+    const info = data.info || {};
+    const specs = info.quick_specs || {};
+    const pane = $("resultsPane");
+    pane.innerHTML = "";
+
+    // Action Bar: Print & Share
+    const actionBar = el("div", { className: "result-action-bar" });
+    
+    const btnShare = el("button", { className: "btn-action", id: "btnShareCard" }, t("share_btn"));
+    btnShare.addEventListener("click", () => {
+      const native = getNativeName(p.scientific_name, currentLang);
+      const display = native ? `${native} (${p.common_names[0] || p.scientific_name})` : (p.common_names[0] || p.scientific_name);
+      const text = `🌿 LeafID Botanical Report\nSpecies: ${display} (${p.scientific_name})\nFamily: ${p.family || "N/A"} • Match: ${p.confidence}%\nLight: ${specs.sunlight || "Bright Indirect"} • Water: ${specs.watering || "Moderate"}\nPet Safety: ${specs.pet_note || "Caution"}\nIdentified with LeafID AI.`;
+
+      if (navigator.share) {
+        navigator.share({ title: "LeafID: " + display, text: text });
+      } else {
+        navigator.clipboard.writeText(text);
+        showToast(t("toast_copied"));
+      }
+    });
+
+    const btnPrint = el("button", { className: "btn-action", id: "btnPrintCard" }, t("print_btn"));
+    btnPrint.addEventListener("click", () => window.print());
+
+    actionBar.append(btnShare, btnPrint);
+    pane.appendChild(actionBar);
+
+    // 1. Plant Hero Card
+    const heroCard = el("div", { className: "result-card plant-hero-card" });
+    
+    const headerRow = el("div", { className: "hero-plant-header" });
+    const titlesCol = el("div", { className: "plant-titles" });
+    
+    // Check Indian Native Names for Hindi, Tamil, Telugu
+    const nativeName = getNativeName(p.scientific_name, currentLang);
+    let commonName = p.common_names && p.common_names.length ? p.common_names[0] : p.scientific_name;
+    if (nativeName) {
+      commonName = `${nativeName} (${commonName})`;
+    }
+
+    titlesCol.appendChild(el("h2", {}, commonName));
+    
+    // Scientific name + Pronunciation button
+    const sciRow = el("div", { className: "sci-pronounce-row" });
+    sciRow.appendChild(el("p", { className: "plant-sci" }, p.scientific_name));
+    
+    const btnSpeak = el("button", { type: "button", className: "btn-pronounce", title: "Listen to pronunciation" }, t("pronounce_btn"));
+    btnSpeak.addEventListener("click", () => speakBotanicalName(p.scientific_name, nativeName || commonName));
+    sciRow.appendChild(btnSpeak);
+    titlesCol.appendChild(sciRow);
+
+    const metaChips = el("div", { className: "meta-chips" });
+    if (p.family) {
+      metaChips.appendChild(el("span", { className: "meta-chip" }, `${t("family_label")}: `, el("b", {}, p.family)));
+    }
+    if (p.common_names && p.common_names.length > 1) {
+      metaChips.appendChild(el("span", { className: "meta-chip" }, `${t("aliases_label")}: `, el("b", {}, p.common_names.slice(1, 4).join(", "))));
+    }
+    titlesCol.appendChild(metaChips);
+
+    // Confidence Match Meter
+    const meterBox = el("div", { className: "match-meter" });
+    meterBox.appendChild(el("div", { className: "match-label" }, t("confidence_label")));
+    const scoreDiv = el("div", { className: "match-score" }, p.confidence + "%");
+    meterBox.appendChild(scoreDiv);
+    const meterBar = el("div", { className: "meter-bar" });
+    const meterFill = el("div", { className: "meter-fill", style: "width: " + p.confidence + "%;" });
+    meterBar.appendChild(meterFill);
+    meterBox.appendChild(meterBar);
+
+    headerRow.appendChild(titlesCol);
+    headerRow.appendChild(meterBox);
+    heroCard.appendChild(headerRow);
+
+    // Quick Spec Badges
+    const specsGrid = el("div", { className: "quick-specs-grid" });
+    
+    specsGrid.appendChild(el("div", { className: "quick-spec-card" },
+      el("div", { className: "spec-icon" }, "☀️"),
+      el("div", {},
+        el("div", { className: "spec-label" }, t("spec_sun")),
+        el("div", { className: "spec-val" }, specs.sunlight || "Bright Indirect")
+      )
+    ));
+
+    specsGrid.appendChild(el("div", { className: "quick-spec-card" },
+      el("div", { className: "spec-icon" }, "💧"),
+      el("div", {},
+        el("div", { className: "spec-label" }, t("spec_water")),
+        el("div", { className: "spec-val" }, specs.watering || "Moderate")
+      )
+    ));
+
+    const petClass = specs.pet_friendly === true ? "spec-pet-safe" : (specs.pet_friendly === false ? "spec-pet-toxic" : "");
+    const petIcon = specs.pet_friendly === true ? "🟢" : (specs.pet_friendly === false ? "🚫" : "⚠️");
+    specsGrid.appendChild(el("div", { className: "quick-spec-card" },
+      el("div", { className: "spec-icon" }, petIcon),
+      el("div", {},
+        el("div", { className: "spec-label" }, t("spec_pet")),
+        el("div", { className: "spec-val " + petClass }, specs.pet_note || "Check Variety")
+      )
+    ));
+
+    specsGrid.appendChild(el("div", { className: "quick-spec-card" },
+      el("div", { className: "spec-icon" }, "🪴"),
+      el("div", {},
+        el("div", { className: "spec-label" }, t("spec_type")),
+        el("div", { className: "spec-val" }, specs.plant_type || "Botanical Specimen")
+      )
+    ));
+
+    heroCard.appendChild(specsGrid);
+
+    // Dual Comparison Box
+    const compBox = el("div", { className: "comparison-box" });
+    
+    const userPanel = el("div", { className: "comparison-panel", title: "Click to magnify leaf venation" });
+    userPanel.appendChild(el("div", { className: "comparison-label" }, t("your_leaf"), el("span", {}, t("live_specimen"))));
+    const userImg = el("img", { className: "comparison-img", src: previewUrl, alt: "Your scanned leaf" });
+    userPanel.appendChild(userImg);
+    userPanel.appendChild(el("div", { className: "zoom-hint" }, t("click_zoom")));
+    userPanel.addEventListener("click", () => openLightbox(previewUrl, "Your Leaf Specimen (Venation Zoom)"));
+    compBox.appendChild(userPanel);
+
+    if (p.reference_image) {
+      const refPanel = el("div", { className: "comparison-panel", title: "Click to magnify reference leaf" });
+      refPanel.appendChild(el("div", { className: "comparison-label" }, t("ref_leaf"), el("span", {}, t("verified_match"))));
+      const refImg = el("img", { className: "comparison-img", src: p.reference_image, alt: "Pl@ntNet reference" });
+      refPanel.appendChild(refImg);
+      refPanel.appendChild(el("div", { className: "zoom-hint" }, t("click_zoom")));
+      refPanel.addEventListener("click", () => openLightbox(p.reference_image, p.scientific_name + " Reference"));
+      compBox.appendChild(refPanel);
+    }
+    heroCard.appendChild(compBox);
+
+    if (info.summary) {
+      const sumBox = el("div", { className: "plant-summary-box" });
+      sumBox.appendChild(el("h4", {}, t("overview_title")));
+      sumBox.appendChild(el("p", {}, info.summary));
+      heroCard.appendChild(sumBox);
+    }
+
+    pane.appendChild(heroCard);
+
+    // 2. Uses, Benefits & Care Section (ON THIS PAGE ONLY)
+    const benefitsWrapper = el("div", { className: "benefits-section-wrapper" });
+    const secHeadline = el("div", { className: "section-headline" });
+    secHeadline.appendChild(el("h3", {}, t("benefits_title")));
+    secHeadline.appendChild(el("span", { className: "badge-mount" }, t("onpage_badge")));
+    benefitsWrapper.appendChild(secHeadline);
+
+    // Category Filter Pills
+    const filterBar = el("div", { className: "benefits-filter-bar" });
+    const filters = [
+      { id: "all", label: t("filter_all") },
+      { id: "card-medicinal", label: t("filter_med") },
+      { id: "card-culinary", label: t("filter_cul") },
+      { id: "card-domestic", label: t("filter_dom") },
+      { id: "card-care", label: t("filter_care") },
+      { id: "card-caution", label: t("filter_caut") },
+    ];
+    filters.forEach((f, idx) => {
+      const pill = el("button", { type: "button", className: "filter-pill" + (idx === 0 ? " active" : "") }, f.label);
+      pill.addEventListener("click", () => {
+        document.querySelectorAll(".filter-pill").forEach((b) => b.classList.remove("active"));
+        pill.classList.add("active");
+        document.querySelectorAll(".benefit-card").forEach((card) => {
+          if (f.id === "all" || card.classList.contains(f.id)) {
+            card.classList.remove("hidden");
+          } else {
+            card.classList.add("hidden");
+          }
+        });
+      });
+      filterBar.appendChild(pill);
+    });
+    benefitsWrapper.appendChild(filterBar);
+
+    const benefitsGrid = el("div", { className: "benefits-grid" });
+
+    // Category 1: Medicinal & Health
+    if (info.uses_medicinal && info.uses_medicinal.length) {
+      const card = el("div", { className: "benefit-card card-medicinal" });
+      const cardHeader = el("div", { className: "benefit-card-header" });
+      cardHeader.appendChild(el("div", { className: "benefit-icon" }, "💊"));
+      cardHeader.appendChild(el("h4", { className: "benefit-card-title" }, t("cat_med_title")));
+      card.appendChild(cardHeader);
+
+      const ul = el("ul", { className: "benefit-list" });
+      info.uses_medicinal.forEach((item) => {
+        const li = el("li", { className: "benefit-item" });
+        li.appendChild(el("strong", {}, item.title));
+        li.appendChild(document.createTextNode(item.text));
+        ul.appendChild(li);
+      });
+      card.appendChild(ul);
+      benefitsGrid.appendChild(card);
+    }
+
+    // Category 2: Culinary & Nutritional
+    if (info.uses_culinary && info.uses_culinary.length) {
+      const card = el("div", { className: "benefit-card card-culinary" });
+      const cardHeader = el("div", { className: "benefit-card-header" });
+      cardHeader.appendChild(el("div", { className: "benefit-icon" }, "🍵"));
+      cardHeader.appendChild(el("h4", { className: "benefit-card-title" }, t("cat_cul_title")));
+      card.appendChild(cardHeader);
+
+      const ul = el("ul", { className: "benefit-list" });
+      info.uses_culinary.forEach((item) => {
+        const li = el("li", { className: "benefit-item" });
+        li.appendChild(el("strong", {}, item.title));
+        li.appendChild(document.createTextNode(item.text));
+        ul.appendChild(li);
+      });
+      card.appendChild(ul);
+      benefitsGrid.appendChild(card);
+    }
+
+    // Category 3: Domestic & Air Purification
+    if (info.uses_domestic && info.uses_domestic.length) {
+      const card = el("div", { className: "benefit-card card-domestic" });
+      const cardHeader = el("div", { className: "benefit-card-header" });
+      cardHeader.appendChild(el("div", { className: "benefit-icon" }, "🏡"));
+      cardHeader.appendChild(el("h4", { className: "benefit-card-title" }, t("cat_dom_title")));
+      card.appendChild(cardHeader);
+
+      const ul = el("ul", { className: "benefit-list" });
+      info.uses_domestic.forEach((item) => {
+        const li = el("li", { className: "benefit-item" });
+        li.appendChild(el("strong", {}, item.title));
+        li.appendChild(document.createTextNode(item.text));
+        ul.appendChild(li);
+      });
+      card.appendChild(ul);
+      benefitsGrid.appendChild(card);
+    }
+
+    // Category 4: Plant Care & Cultivation
+    if (info.care_guide && info.care_guide.length) {
+      const card = el("div", { className: "benefit-card card-care" });
+      const cardHeader = el("div", { className: "benefit-card-header" });
+      cardHeader.appendChild(el("div", { className: "benefit-icon" }, "🪴"));
+      cardHeader.appendChild(el("h4", { className: "benefit-card-title" }, t("cat_care_title")));
+      card.appendChild(cardHeader);
+
+      const ul = el("ul", { className: "benefit-list" });
+      info.care_guide.forEach((item) => {
+        const li = el("li", { className: "benefit-item" });
+        li.appendChild(el("strong", {}, item.title));
+        li.appendChild(document.createTextNode(item.text));
+        ul.appendChild(li);
+      });
+      card.appendChild(ul);
+      benefitsGrid.appendChild(card);
+    }
+
+    // Category 5: Safety Cautions
+    if (info.cautions && info.cautions.length) {
+      const card = el("div", { className: "benefit-card card-caution" });
+      const cardHeader = el("div", { className: "benefit-card-header" });
+      cardHeader.appendChild(el("div", { className: "benefit-icon" }, "⚠️"));
+      cardHeader.appendChild(el("h4", { className: "benefit-card-title" }, t("cat_caut_title")));
+      card.appendChild(cardHeader);
+
+      const ul = el("ul", { className: "benefit-list" });
+      info.cautions.forEach((item) => {
+        const li = el("li", { className: "benefit-item" });
+        li.appendChild(el("strong", {}, item.title));
+        li.appendChild(document.createTextNode(item.text));
+        ul.appendChild(li);
+      });
+      card.appendChild(ul);
+      benefitsGrid.appendChild(card);
+    }
+
+    benefitsWrapper.appendChild(benefitsGrid);
+    pane.appendChild(benefitsWrapper);
+
+    // 3. Alternative Matches Card
+    if (data.alternatives && data.alternatives.length) {
+      const altCard = el("div", { className: "result-card" });
+      altCard.appendChild(el("h3", { style: "font-size: 1.25rem; margin-bottom: 0.5rem; color: var(--ink);" }, t("other_candidates")));
+      
+      const altGrid = el("div", { className: "alternatives-grid" });
+      data.alternatives.forEach((alt) => {
+        const altNative = getNativeName(alt.scientific_name, currentLang);
+        const altDisplay = altNative ? `${altNative} (${alt.common_name || alt.scientific_name})` : (alt.common_name || alt.scientific_name);
+        const pill = el("div", { className: "alt-pill" });
+        const left = el("div", {});
+        left.appendChild(el("div", { className: "alt-name" }, altDisplay));
+        left.appendChild(el("div", { className: "alt-sci" }, alt.scientific_name));
+        pill.appendChild(left);
+        pill.appendChild(el("span", { className: "alt-pct" }, alt.confidence + "%"));
+        altGrid.appendChild(pill);
+      });
+      altCard.appendChild(altGrid);
+      pane.appendChild(altCard);
+    }
+
+    // 4. Google Lens Matches
+    if (data.lens && data.lens.length) {
+      const lensCard = el("div", { className: "result-card" });
+      lensCard.appendChild(el("h3", { style: "font-size: 1.25rem; margin-bottom: 0.5rem; color: var(--ink);" }, t("lens_matches")));
+      const ul = el("ul", { style: "margin:0; padding-left:1.25rem; font-size:0.92rem; color:var(--accent);" });
+      data.lens.forEach((m) => {
+        const li = el("li", { style: "margin-bottom: 0.35rem;" });
+        const a = el("a", { href: m.link, target: "_blank", rel: "noopener", textContent: m.title, style: "color: var(--accent); font-weight:600;" });
+        li.appendChild(a);
+        if (m.source) li.appendChild(document.createTextNode(" — " + m.source));
+        ul.appendChild(li);
+      });
+      lensCard.appendChild(ul);
+      pane.appendChild(lensCard);
+    }
+  }
+</script>
+</body>
+</html>
